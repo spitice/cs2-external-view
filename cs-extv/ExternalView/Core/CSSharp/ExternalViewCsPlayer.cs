@@ -20,7 +20,7 @@ namespace LupercaliaMGCore.modules.ExternalView.CSSharp
         private CBasePlayerPawn? _Pawn => _Controller.PlayerPawn.Value;
 
         public ExternalViewCsPlayer(CCSPlayerController controller, ILocalizer localizer)
-            : base(() => controller.PlayerPawn.Value!)
+            : base(() => controller.PlayerPawn.Value)
         {
             _Controller = controller;
             _localizer = localizer;

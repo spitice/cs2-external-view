@@ -14,11 +14,11 @@ public sealed class ExternalViewPlugin : TncssPluginBase
 
     public override string ModuleName => "External View";
 
-    public override string ModuleVersion => "2.1.0";
+    public override string ModuleVersion => "3.1.0";
 
-    public override string ModuleAuthor => "Spitice";
+    public override string ModuleAuthor => "Spitice, uru";
 
-    public override string ModuleDescription => "A standalone plugin of Lupercalia MG ExternalView";
+    public override string ModuleDescription => "A standalone plugin of Lupercalia MG ExternalView - now C# only!";
 
     public override string BaseCfgDirectoryPath => Path.Combine(Server.GameDirectory, "csgo/cfg/extv/");
 

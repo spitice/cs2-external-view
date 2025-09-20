@@ -12,6 +12,8 @@ namespace ExternalView.Tests.Core.Fakes
         public float FreeCameraSpeed { get; set; } = 800;
         public float FreeCameraAltSpeed { get; set; } = 2400;
         public bool IsObserverViewEnabled { get; set; } = true;
+        public bool IsModelViewEnabled { get; set; } = true;
         public bool IsAdminPrivilegesEnabled { get; set; } = true;
+        public bool IsThirdPersonTraceBlockEnabled { get; set; } = false;
     }
 }

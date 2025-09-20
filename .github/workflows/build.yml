@@ -1,0 +1,128 @@
+name: CI
+
+on:
+  push:
+    tags:
+      - '*'
+    branches:
+      - '*'
+    paths-ignore:
+    - LICENSE
+    - README.md
+    - '**.md'
+  pull_request:
+    paths-ignore:
+    - LICENSE
+    - README.md
+    - '**.md'
+
+jobs:
+  build-csharp:
+    name: Build C# (ExternalView Plugin)
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        include:
+          - os: windows-latest
+            artifact-name: Windows-csharp
+          - os: ubuntu-latest
+            artifact-name: Linux-csharp
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        working-directory: cs-extv
+        run: dotnet restore
+
+      - name: Build
+        working-directory: cs-extv
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Test
+        working-directory: cs-extv
+        run: dotnet test --configuration Release --no-build --verbosity normal
+
+      - name: Publish
+        working-directory: cs-extv
+        run: dotnet publish ExternalView/ExternalView.csproj --configuration Release --output ../artifacts/csharp/
+
+      - name: Copy language files
+        run: |
+          mkdir -p artifacts/csharp/lang
+          cp addons/counterstrikesharp/plugins/ExternalView/lang/* artifacts/csharp/lang/
+
+      - name: Upload C# artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: artifacts/csharp/
+
+  package:
+    name: Package Release
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [build-csharp]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Create release packages
+        run: |
+          version=${GITHUB_REF#refs/tags/}
+          
+          # Create Windows package
+          mkdir -p release/windows/addons/counterstrikesharp/plugins/ExternalView
+          
+          # Copy Windows C# plugin
+          if [ -d "Windows-csharp" ]; then
+            cp Windows-csharp/*.dll release/windows/addons/counterstrikesharp/plugins/ExternalView/ 2>/dev/null || true
+            cp -r Windows-csharp/lang release/windows/addons/counterstrikesharp/plugins/ExternalView/ 2>/dev/null || true
+          fi
+          
+          # Create Linux package
+          mkdir -p release/linux/addons/counterstrikesharp/plugins/ExternalView
+          
+          # Copy Linux C# plugin
+          if [ -d "Linux-csharp" ]; then
+            cp Linux-csharp/*.dll release/linux/addons/counterstrikesharp/plugins/ExternalView/ 2>/dev/null || true
+            cp -r Linux-csharp/lang release/linux/addons/counterstrikesharp/plugins/ExternalView/ 2>/dev/null || true
+          fi
+          
+          # Create archives
+          cd release
+          if [ -d "windows" ]; then
+            cd windows
+            zip -r ../../cs2-external-view-${version}-windows.zip *
+            cd ..
+          fi
+          
+          if [ -d "linux" ]; then
+            cd linux
+            tar -czf ../../cs2-external-view-${version}-linux.tar.gz *
+            cd ..
+          fi
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            cs2-external-view-*.zip
+            cs2-external-view-*.tar.gz
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

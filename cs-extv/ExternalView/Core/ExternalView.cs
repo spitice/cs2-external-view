@@ -8,17 +8,17 @@ using TNCSSPluginFoundation.Models.Plugin;
 
 /**
  * Third person and custom view camera modes.
- * 
+ *
  * Including the following camera modes:
- * 
+ *
  * - Third person
  * - Third person (offseted to right/left)
  * - Model view
  * - Free camera (a.k.a., noclip)
  * - Watch other players
- * 
- * Requires ExternalViewHelper metamod plugin to fix shoot/+use location on third peron camera.
- * Check https://github.com/spitice/cs2-external-view for more detail.
+ *
+ * Uses CounterStrikeSharp's built-in OnServerPreEntityThink/OnServerPostEntityThink events
+ * to fix shoot/+use location on third person camera.
  *
  * This module is inspired by "ThirdPerson-WIP" plugin by BoinK & UgurhanK.
  * Big thanks for sharing the awesome plugin!
@@ -58,8 +58,12 @@ namespace LupercaliaMGCore.modules.ExternalView
             new("extv_freecam_alt_speed", "The speed of free camera movement while walk button pressed", 2400);
         public readonly FakeConVar<bool> ConVar_IsObserverViewEnabled =
             new("extv_observer_enabled", "True if observer views (i.e., freecam and watch) are enabled for non-admin players.", true);
+        public readonly FakeConVar<bool> ConVar_IsModelViewEnabled =
+            new("extv_modelview_enabled", "True if model view camera mode is enabled.", true);
         public readonly FakeConVar<bool> ConVar_IsAdminPrivilegesEnabled =
             new("extv_admin_privileges_enabled", "True if admins can use all features regardless of the flags (e.g., IsObserverViewEnabled)", true);
+        public readonly FakeConVar<bool> ConVar_IsThirdPersonTraceBlockEnabled =
+            new("extv_thirdperson_traceblock_enabled", "Enable camera obstruction handling via trace for third-person camera", false);
 
         float IExternalViewConVars.ThirdPersonMinDistance => ConVar_ThirdPersonMinDistance.Value;
         float IExternalViewConVars.ThirdPersonMaxDistance => ConVar_ThirdPersonMaxDistance.Value;
@@ -69,11 +73,13 @@ namespace LupercaliaMGCore.modules.ExternalView
         float IExternalViewConVars.FreeCameraSpeed => ConVar_FreeCameraSpeed.Value;
         float IExternalViewConVars.FreeCameraAltSpeed => ConVar_FreeCameraAltSpeed.Value;
         bool IExternalViewConVars.IsObserverViewEnabled => ConVar_IsObserverViewEnabled.Value;
+        bool IExternalViewConVars.IsModelViewEnabled => ConVar_IsModelViewEnabled.Value;
         bool IExternalViewConVars.IsAdminPrivilegesEnabled => ConVar_IsAdminPrivilegesEnabled.Value;
+        bool IExternalViewConVars.IsThirdPersonTraceBlockEnabled => ConVar_IsThirdPersonTraceBlockEnabled.Value;
 
         string ILocalizer.LocalizeForPlayer(CCSPlayerController controller, string message, params object[] args)
         {
-            return LocalizeWithModulePrefixForPlayer(controller, message, args);
+            return LocalizeWithModulePrefix(controller, message, args);
         }
 
         protected override void OnInitialize()
@@ -93,7 +99,9 @@ namespace LupercaliaMGCore.modules.ExternalView
             TrackConVar(ConVar_FreeCameraSpeed);
             TrackConVar(ConVar_FreeCameraAltSpeed);
             TrackConVar(ConVar_IsObserverViewEnabled);
+            TrackConVar(ConVar_IsModelViewEnabled);
             TrackConVar(ConVar_IsAdminPrivilegesEnabled);
+            TrackConVar(ConVar_IsThirdPersonTraceBlockEnabled);
 
             Plugin.AddCommand("css_tp", "Toggles third person camera mode.", CommandThirdPerson);
             Plugin.AddCommand("css_tpp", "Toggles third person offset camera mode (right handed).", CommandThirdPersonOffsetRightHanded);
@@ -105,7 +113,7 @@ namespace LupercaliaMGCore.modules.ExternalView
             Plugin.AddCommand("css_g", "Starts to watche other player.", CommandWatch);
             Plugin.AddCommand("css_camdist", "Changes the third person camera distance.", CommandCamDist);
 
-            _PositionFixer = new AttackAndUsePositionFixer(Logger, (interval, action) => Plugin.AddTimer(interval, action), GetPlayersForPositonFix);
+            _PositionFixer = new AttackAndUsePositionFixer(Logger, Plugin, GetPlayersForPositonFix);
         }
 
         protected override void OnUnloadModule()
@@ -207,6 +215,12 @@ namespace LupercaliaMGCore.modules.ExternalView
         {
             if (controller == null)
                 return;
+
+            if (!ConVar_IsModelViewEnabled.Value)
+            {
+                controller.PrintToChat(((ILocalizer)this).LocalizeForPlayer(controller, "ExternalView.ModelView.Disabled"));
+                return;
+            }
 
             _System?.ToggleModelView(controller.SteamID);
         }

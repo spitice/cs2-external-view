@@ -9,6 +9,7 @@
     "ExternalView.ThirdPerson.CameraDistance.Set": "Changed third person camera distance to {lightpurple}{0}{default}.",
     "ExternalView.ModelView.Start": "{orange}Model view{default} camera has been activated.",
     "ExternalView.ModelView.EndedByJump": "{grey}Model view camera has been deactivated by jump.{default}",
+    "ExternalView.ModelView.Disabled": "{grey}Model view is currently disabled.{default}",
     "ExternalView.FreeCam.Start": "{orange}Free{default} camera has been activated.",
     "ExternalView.FreeCam.RequirePermission": "{grey}You need permission to use free camera.{default}",
     "ExternalView.Watch.Start": "{orange}Watch{default} camera has been activated.",

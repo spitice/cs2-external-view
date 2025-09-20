@@ -9,14 +9,24 @@ namespace LupercaliaMGCore.modules.ExternalView.CSSharp
 {
     internal class ExternalViewCsEntity : IExternalViewCsEntity
     {
-        public delegate CBaseEntity GetEntityDelegate();
+        // Return nullable so callers can provide "possibly invalid" entities safely.
+        public delegate CBaseEntity? GetEntityDelegate();
 
         private readonly GetEntityDelegate _GetEntity;
 
         private RenderMode_t? _Hide_LastRenderMode;
         private Color? _Hide_LastRenderColor;
 
-        private CBaseEntity _Entity => _GetEntity();
+        private bool TryGetEntity(out CBaseEntity entity)
+        {
+            entity = _GetEntity();
+            if (entity == null || !entity.IsValid)
+            {
+                entity = null!;
+                return false;
+            }
+            return true;
+        }
 
         public ExternalViewCsEntity(CBaseEntity entity) : this(() => entity)
         {
@@ -27,17 +37,60 @@ namespace LupercaliaMGCore.modules.ExternalView.CSSharp
             _GetEntity = getEntity;
         }
 
-        public bool IsValid => _Entity.IsValid;
+        public bool IsValid
+        {
+            get
+            {
+                return TryGetEntity(out var ent);
+            }
+        }
 
-        public uint HandleRaw => _Entity.EntityHandle.Raw;
+        public uint HandleRaw
+        {
+            get
+            {
+                if (!TryGetEntity(out var ent))
+                    return uint.MaxValue;
+                return ent.EntityHandle.Raw;
+            }
+        }
 
-        public Vector3 Origin => MathUtils.ToVector3(_Entity.AbsOrigin);
-        public Vector3 Rotation => MathUtils.ToVector3(_Entity.AbsRotation);
-        public Vector3 Velocity => MathUtils.ToVector3(_Entity.AbsVelocity);
+        public Vector3 Origin
+        {
+            get
+            {
+                if (!TryGetEntity(out var ent))
+                    return Vector3.Zero;
+                return MathUtils.ToVector3(ent.AbsOrigin);
+            }
+        }
+
+        public Vector3 Rotation
+        {
+            get
+            {
+                if (!TryGetEntity(out var ent))
+                    return Vector3.Zero;
+                return MathUtils.ToVector3(ent.AbsRotation);
+            }
+        }
+
+        public Vector3 Velocity
+        {
+            get
+            {
+                if (!TryGetEntity(out var ent))
+                    return Vector3.Zero;
+                return MathUtils.ToVector3(ent.AbsVelocity);
+            }
+        }
 
         public void Teleport(Vector3? origin, Vector3? angle, Vector3? velocity)
         {
-            _Entity.Teleport(
+            if (!TryGetEntity(out var ent))
+                return;
+
+            ent.Teleport(
                 MathUtils.ToVectorOrNull(origin),
                 MathUtils.ToQAngleOrNull(angle),
                 MathUtils.ToVectorOrNull(velocity)
@@ -46,7 +99,10 @@ namespace LupercaliaMGCore.modules.ExternalView.CSSharp
 
         public void Remove()
         {
-            _Entity.Remove();
+            if (!TryGetEntity(out var ent))
+                return;
+
+            ent.Remove();
         }
 
         public bool IsVisible
@@ -57,15 +113,20 @@ namespace LupercaliaMGCore.modules.ExternalView.CSSharp
                 if (value != _Hide_LastRenderMode.HasValue)
                     return;
 
-                var modelEntity = _Entity as CBaseModelEntity;
-                if (modelEntity == null)
+                if (!TryGetEntity(out var ent))
+                    return;
+
+                var modelEntity = ent as CBaseModelEntity;
+                if (modelEntity == null || !modelEntity.IsValid)
                     return;
 
                 if (value)
                 {
-                    modelEntity.RenderMode = _Hide_LastRenderMode!.Value;
-                    modelEntity.Render = _Hide_LastRenderColor!.Value;
-
+                    if (_Hide_LastRenderMode.HasValue && _Hide_LastRenderColor.HasValue)
+                    {
+                        modelEntity.RenderMode = _Hide_LastRenderMode.Value;
+                        modelEntity.Render = _Hide_LastRenderColor.Value;
+                    }
                     _Hide_LastRenderMode = null;
                     _Hide_LastRenderColor = null;
                 }
@@ -77,6 +138,7 @@ namespace LupercaliaMGCore.modules.ExternalView.CSSharp
                     modelEntity.RenderMode = RenderMode_t.kRenderTransAlpha;
                     modelEntity.Render = Color.FromArgb(0, 255, 255, 255);
                 }
+
                 Utilities.SetStateChanged(modelEntity, "CBaseModelEntity", "m_clrRender");
             }
         }
@@ -85,26 +147,38 @@ namespace LupercaliaMGCore.modules.ExternalView.CSSharp
         {
             set
             {
+                if (!TryGetEntity(out var ent))
+                    return;
+
                 if (value == null)
                 {
-                    _Entity.AcceptInput("SetParent", null, null, "");
+                    ent.AcceptInput("SetParent", null, null, "");
                     return;
                 }
 
                 var target = value as ExternalViewCsEntity;
-                if (target == null)
+                if (target == null || !target.TryGetEntity(out var targetEnt))
                     return;
 
-                _Entity.AcceptInput("SetParent", target._Entity, null, "!activator");
+                ent.AcceptInput("SetParent", targetEnt, null, "!activator");
             }
         }
 
         public string Model
         {
-            get => _Entity.CBodyComponent?.SceneNode?.GetSkeletonInstance().ModelState.ModelName ?? "";
-            set {
-                var modelEntity = _Entity as CBaseModelEntity;
-                if (modelEntity == null)
+            get
+            {
+                if (!TryGetEntity(out var ent))
+                    return "";
+                return ent.CBodyComponent?.SceneNode?.GetSkeletonInstance().ModelState.ModelName ?? "";
+            }
+            set
+            {
+                if (!TryGetEntity(out var ent))
+                    return;
+
+                var modelEntity = ent as CBaseModelEntity;
+                if (modelEntity == null || !modelEntity.IsValid)
                     return;
 
                 modelEntity.SetModel(value);
@@ -118,7 +192,10 @@ namespace LupercaliaMGCore.modules.ExternalView.CSSharp
             if (otherEntity == null)
                 return false;
 
-            return _Entity.Handle == otherEntity._Entity.Handle;
+            if (!TryGetEntity(out var ent) || !otherEntity.TryGetEntity(out var otherEnt))
+                return false;
+
+            return ent.Handle == otherEnt.Handle;
         }
     }
 }

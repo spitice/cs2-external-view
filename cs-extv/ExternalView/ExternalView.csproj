@@ -5,6 +5,7 @@
         <VersionPrefix>2.1.0</VersionPrefix>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <Target Name="CopyPlugin" AfterTargets="Build" Condition="'$(CS2_SERVER_DIR)' != ''">
@@ -14,7 +15,8 @@
     </Target>
 
     <ItemGroup>
-        <PackageReference Include="CounterStrikeSharp.API" Version="1.0.316" />
-        <PackageReference Include="TNCSSPluginFoundation" Version="0.3.0" />
+        <PackageReference Include="CounterStrikeSharp.API" Version="1.0.339" />
+        <PackageReference Include="CS2TraceRay" Version="1.0.8" />
+        <PackageReference Include="TNCSSPluginFoundation" Version="0.5.2" />
     </ItemGroup>
 </Project>

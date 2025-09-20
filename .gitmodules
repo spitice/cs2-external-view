@@ -1,13 +1,3 @@
-[submodule "cpp-extv/extern/hl2sdk"]
-	path = cpp-extv/extern/hl2sdk
-	url = https://github.com/alliedmodders/hl2sdk
-	branch = cs2
-[submodule "cpp-extv/extern/metamod"]
-	path = cpp-extv/extern/metamod
-	url = https://github.com/alliedmodders/metamod-source
-[submodule "cpp-extv/extern/cs2fixes"]
-	path = cpp-extv/extern/cs2fixes
-	url = https://github.com/Source2ZE/CS2Fixes
 [submodule "cs-extv/extern/lupercalia-mg"]
 	path = cs-extv/extern/lupercalia-mg
 	url = https://github.com/spitice/lupercalia-mg-cs2

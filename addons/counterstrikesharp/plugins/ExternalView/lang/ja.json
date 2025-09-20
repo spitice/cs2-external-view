@@ -9,6 +9,7 @@
     "ExternalView.ThirdPerson.CameraDistance.Set": "三人称視点カメラ距離を{lightpurple}{0}{default}に設定しました.",
     "ExternalView.ModelView.Start": "{orange}モデルビュー{default}カメラに変更します",
     "ExternalView.ModelView.EndedByJump": "{grey}モデルビューカメラはジャンプによって解除されました{default}",
+    "ExternalView.ModelView.Disabled": "{grey}モデルビューは現在無効です{default}",
     "ExternalView.FreeCam.Start": "{orange}フリー{default}カメラに変更します",
     "ExternalView.FreeCam.RequirePermission": "{grey}フリーカメラを使用するには権限が必要です{default}",
     "ExternalView.Watch.Start": "{orange}ウォッチ{default}カメラに変更します",

@@ -1,6 +1,7 @@
 ﻿using CounterStrikeSharp.API;
 using LupercaliaMGCore.modules.ExternalView.Utils;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace LupercaliaMGCore.modules.ExternalView.Cameras
 {
@@ -22,28 +23,21 @@ namespace LupercaliaMGCore.modules.ExternalView.Cameras
         /// </summary>
         protected abstract float AltCameraSpeed { get; }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         protected Vector3 CalculateVelocity()
         {
             var moveX = MoveX;
             var moveY = MoveY;
 
-            var isMoving = Math.Abs(moveX) + Math.Abs(moveY) > 0.001;
+            var isMoving = Math.Abs(moveX) + Math.Abs(moveY) > 0.001f;
             var isSpeedKeyDown = Ctx.Player.Buttons.IsDown(PlayerButtons.Speed);
 
-            // Calculate the moving direction
+            // Calculate the moving direction using optimized scalar approach
             var wishDir = Vector3.Zero;
             if (isMoving)
             {
                 var viewAngle = Ctx.Player.ViewAngle;
-                var quatYaw = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, MathUtils.ToRad(viewAngle.Y));
-                var quatPitch = Quaternion.CreateFromAxisAngle(Vector3.UnitY, MathUtils.ToRad(viewAngle.X));
-                var viewQuat = Quaternion.Multiply(quatYaw, quatPitch);
-
-                var rightDir = Vector3.Transform(-Vector3.UnitY, viewQuat);
-                var forwardDir = Vector3.Transform(Vector3.UnitX, viewQuat);
-
-                var wishDirNonNormalized = rightDir * moveX + forwardDir * moveY;
-                wishDir = Vector3.Normalize(wishDirNonNormalized);
+                wishDir = MathUtils.CalculateWishDirection(viewAngle, moveX, moveY);
             }
 
             // Moving speed
@@ -57,10 +51,10 @@ namespace LupercaliaMGCore.modules.ExternalView.Cameras
                 }
             }
 
-            // Accelerate
+            // Accelerate using optimized vector operations
             var currentSpeedInWishDir = Vector3.Dot(_LastVelocity, wishDir);
             var addSpeed = wishSpeed - currentSpeedInWishDir;
-            var accelerationScale = Math.Max(250, wishSpeed);
+            var accelerationScale = Math.Max(250f, wishSpeed);
             var accelSpeed = Consts.FlyCameraAccelerate * Ctx.Api.DeltaTime * accelerationScale;
             addSpeed = Math.Min(accelSpeed, addSpeed);
             var velocity = _LastVelocity + addSpeed * wishDir;
@@ -76,7 +70,7 @@ namespace LupercaliaMGCore.modules.ExternalView.Cameras
             {
                 var control = Math.Max(speed, CameraSpeed * 0.25f);
                 var drop = control * Consts.FlyCameraFriction * Ctx.Api.DeltaTime;
-                var deceleratedSpeed = Math.Max(speed - drop, 0);
+                var deceleratedSpeed = Math.Max(speed - drop, 0f);
                 var speedScale = deceleratedSpeed / speed;
                 velocity *= speedScale;
             }
@@ -84,6 +78,7 @@ namespace LupercaliaMGCore.modules.ExternalView.Cameras
             _LastVelocity = velocity;
             return velocity;
         }
+
 
         private float MoveX
         {

@@ -77,6 +77,8 @@ namespace LupercaliaMGCore.modules.ExternalView.Player
                 _ViewEntityHandler?.Disable();
                 _ViewEntityHandler?.Enable();
 
+                // Re-evaluate after re-creation
+                cameraEntity = CameraEntity;
                 if (cameraEntity == null || !cameraEntity.IsValid)
                 {
                     return false;

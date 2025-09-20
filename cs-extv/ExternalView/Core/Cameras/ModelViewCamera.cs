@@ -1,5 +1,6 @@
 ﻿using LupercaliaMGCore.modules.ExternalView.Utils;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace LupercaliaMGCore.modules.ExternalView.Cameras
 {
@@ -15,6 +16,7 @@ namespace LupercaliaMGCore.modules.ExternalView.Cameras
 
         protected override float AltCameraSpeed => Ctx.Api.ConVars.ModelViewCameraAltSpeed;
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public override bool Update()
         {
             var cameraEntity = Ctx.CameraEntity;
@@ -30,18 +32,20 @@ namespace LupercaliaMGCore.modules.ExternalView.Cameras
 
             if (_LastRelPos == null)
             {
-                // Initialize the camera position
+                // Initialize the camera position using optimized scalar calculation
                 _LastRelPos = MathUtils.CalculateThirdPersonOffset(Ctx.Player.ViewAngle, Consts.ModelViewInitialCameraDistance);
             }
 
             var velocity = CalculateVelocity();
             var relPos = velocity * Ctx.Api.DeltaTime + _LastRelPos!.Value;
 
-            // Restrict the movement by the specified radius
+            // Restrict the movement by the specified radius using optimized scalar calculation
             var distance = relPos.Length();
-            if (distance > Ctx.Api.ConVars.ModelViewCameraRadius)
+            var maxRadius = Ctx.Api.ConVars.ModelViewCameraRadius;
+            
+            if (distance > maxRadius)
             {
-                relPos *= Ctx.Api.ConVars.ModelViewCameraRadius / distance;
+                relPos = relPos * (maxRadius / distance);
             }
 
             _LastRelPos = relPos;

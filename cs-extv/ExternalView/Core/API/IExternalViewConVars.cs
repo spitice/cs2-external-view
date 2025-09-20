@@ -10,6 +10,8 @@ namespace LupercaliaMGCore.modules.ExternalView.API
         float FreeCameraSpeed { get; }
         float FreeCameraAltSpeed { get; }
         bool IsObserverViewEnabled { get; }
+        bool IsModelViewEnabled { get; }
         bool IsAdminPrivilegesEnabled { get; }
+        bool IsThirdPersonTraceBlockEnabled { get; }
     }
 }

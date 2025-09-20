@@ -3,15 +3,15 @@
 
 ExternalView provides external camera modes (third-person, model view, watch other player, and free camera) for alive players that can be accessed via chat command or console command.
 
+This plugin uses CounterStrikeSharp's built-in `OnServerPreEntityThink`/`OnServerPostEntityThink` events to fix attack and use positions in third-person mode, eliminating the need for a separate C++ metamod plugin.
+
 ## Installation
 
 ### Standalone
 
 - PREREQUISITES:
-	- [Metamod:Source](https://www.metamodsource.net/)
 	- [CounterStrikeSharp](https://docs.cssharp.dev/index.html)
-	- [TNCSSPluginFoundation
-](https://github.com/fltuna/TNCSSPluginFoundation)
+	- [TNCSSPluginFoundation](https://github.com/fltuna/TNCSSPluginFoundation)
 - Download the [latest ExternalView release](https://github.com/spitice/cs2-external-view/releases)
 - Copy/move the files to the server's `csgo` directory
 
@@ -111,6 +111,29 @@ extv_observer_enabled 1
 
 // True if admins can use all features regardless of the flags (e.g., IsObserverViewEnabled)
 extv_admin_privileges_enabled 1
+
+// Enable model view camera feature
+extv_modelview_enabled 1
+
+// Enable camera obstruction handling via trace for third-person camera
+extv_thirdperson_traceblock_enabled 0
+```
+
+### Third-person trace-based camera obstruction
+
+Controls whether the third-person camera uses a world trace to prevent clipping into walls and props. When enabled, the camera position is pulled toward the player if an obstruction is detected; when disabled, the camera uses the desired offset without obstruction checks (may clip through geometry, but has lower CPU overhead).
+
+- 1: Enabled (default) — obstruction-aware camera with collision backoff
+- 0: Disabled — no trace, camera always uses desired position
+
+Example:
+
+```
+// Turn off trace-based obstruction handling
+extv_thirdperson_traceblock_enabled 0
+
+// Turn it back on
+extv_thirdperson_traceblock_enabled 1
 ```
 
 ### Disabling freecam and watch for PvP mode
@@ -135,14 +158,30 @@ I'd like to acknowledge the ideas and inspirations I've drawn from the following
 	- Third-person camera idea via overriding CameraService.ViewEntity
 - [CS2-PlayerModelChanger](https://github.com/samyycX/CS2-PlayerModelChanger) by samyyc
 	- The logic to inspect player model by using prop_physics_override
-- [CS2Fixes](https://github.com/Source2ZE/CS2Fixes) by Source2ZE community
-	- Hooking PreEntityThink/PostEntityThink from metamod plugin
 - [TNCSSPluginFoundation](https://github.com/fltuna/TNCSSPluginFoundation/tree/main) by tuna
 	- Easier development of CSSharp plugin
-- [Metamod:Source](https://www.metamodsource.net/)
 - [CounterStrikeSharp](https://docs.cssharp.dev/index.html)
+	- OnServerPreEntityThink/OnServerPostEntityThink events for position fixing
 
 ## Changelogs
+
+#### v3.1.0 (25-09-14)
+
+- Compiled with latest CS#
+- Improved vector calculation
+- Add ConVar: `extv_modelview_enabled` 
+  - Default: 1 (enabled)
+- Add ConVar: `extv_thirdperson_traceblock_enabled`
+  - Toggle trace-based camera obstruction for third-person camera
+  - Default: 0 (disabled)
+
+#### v3.0.0 (25-08-26)
+
+- **BREAKING CHANGE**: Removed C++ metamod plugin dependency
+- Now uses CounterStrikeSharp's built-in OnServerPreEntityThink/OnServerPostEntityThink events
+- Simplified installation process - no longer requires Metamod:Source
+- Improved reliability and reduced complexity
+- Fixed code for latest TNCSSPluginFoundation
 
 #### v2.1.1 (25-08-16)
 
