@@ -84,25 +84,25 @@ jobs:
       - name: Create release packages
         run: |
           version=${GITHUB_REF#refs/tags/}
-          
+
           # Create Windows package
           mkdir -p release/windows/addons/counterstrikesharp/plugins/ExternalView
-          
+
           # Copy Windows C# plugin
           if [ -d "Windows-csharp" ]; then
-            cp Windows-csharp/*.dll release/windows/addons/counterstrikesharp/plugins/ExternalView/ 2>/dev/null || true
+            cp Windows-csharp/ExternalView.dll release/windows/addons/counterstrikesharp/plugins/ExternalView/ 2>/dev/null || true
             cp -r Windows-csharp/lang release/windows/addons/counterstrikesharp/plugins/ExternalView/ 2>/dev/null || true
           fi
-          
+
           # Create Linux package
           mkdir -p release/linux/addons/counterstrikesharp/plugins/ExternalView
-          
+
           # Copy Linux C# plugin
           if [ -d "Linux-csharp" ]; then
-            cp Linux-csharp/*.dll release/linux/addons/counterstrikesharp/plugins/ExternalView/ 2>/dev/null || true
+            cp Linux-csharp/ExternalView.dll release/linux/addons/counterstrikesharp/plugins/ExternalView/ 2>/dev/null || true
             cp -r Linux-csharp/lang release/linux/addons/counterstrikesharp/plugins/ExternalView/ 2>/dev/null || true
           fi
-          
+
           # Create archives
           cd release
           if [ -d "windows" ]; then
@@ -110,7 +110,7 @@ jobs:
             zip -r ../../cs2-external-view-${version}-windows.zip *
             cd ..
           fi
-          
+
           if [ -d "linux" ]; then
             cd linux
             tar -czf ../../cs2-external-view-${version}-linux.tar.gz *

@@ -156,6 +156,12 @@ I'd like to acknowledge the ideas and inspirations I've drawn from the following
 
 ## Changelogs
 
+#### v3.1.1 (25-09-26)
+
+- Remove dependencies from release packagen
+- Fix `!fc` and `!mv` camera movement
+- Change chat message prefix color to green
+
 #### v3.1.0 (25-09-14)
 
 - Compiled with latest CS#
