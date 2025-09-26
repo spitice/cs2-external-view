@@ -1,4 +1,4 @@
-﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using LupercaliaMGCore.modules.ExternalView.API;
 using LupercaliaMGCore.modules.ExternalView.Utils;
@@ -19,7 +19,7 @@ namespace LupercaliaMGCore.modules.ExternalView.CSSharp
 
         private bool TryGetEntity(out CBaseEntity entity)
         {
-            entity = _GetEntity();
+            entity = _GetEntity()!;
             if (entity == null || !entity.IsValid)
             {
                 entity = null!;
