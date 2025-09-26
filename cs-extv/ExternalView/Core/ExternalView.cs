@@ -2,6 +2,7 @@ using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Cvars;
+using CounterStrikeSharp.API.Modules.Utils;
 using LupercaliaMGCore.modules.ExternalView.API;
 using LupercaliaMGCore.modules.ExternalView.CSSharp;
 using TNCSSPluginFoundation.Models.Plugin;
@@ -32,7 +33,7 @@ namespace LupercaliaMGCore.modules.ExternalView
         , ILocalizer
     {
         public override string PluginModuleName => "External View";
-        public override string ModuleChatPrefix => "[External View]";
+        public override string ModuleChatPrefix => $" {ChatColors.Green}[ExternalView]{ChatColors.Default}";
         protected override bool UseTranslationKeyInModuleChatPrefix => false;
 
         private ExternalViewSystem? _System;

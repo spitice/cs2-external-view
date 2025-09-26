@@ -8,13 +8,13 @@ namespace LupercaliaMGCore;
 public sealed class ExternalViewPlugin : TncssPluginBase
 {
     public override string PluginPrefix =>
-        $" [{ChatColors.Orange}ExternalView{ChatColors.Default}]";
+        $" {ChatColors.Green}[ExternalView]{ChatColors.Default}";
 
     public override bool UseTranslationKeyInPluginPrefix => false;
 
     public override string ModuleName => "External View";
 
-    public override string ModuleVersion => "3.1.0";
+    public override string ModuleVersion => "3.1.1";
 
     public override string ModuleAuthor => "Spitice, uru";
 
