@@ -12,20 +12,9 @@ This plugin uses CounterStrikeSharp's built-in `OnServerPreEntityThink`/`OnServe
 - PREREQUISITES:
 	- [CounterStrikeSharp](https://docs.cssharp.dev/index.html)
 	- [TNCSSPluginFoundation](https://github.com/fltuna/TNCSSPluginFoundation)
+	- [CS2TraceRay](https://github.com/schwarper/CS2TraceRay)
 - Download the [latest ExternalView release](https://github.com/spitice/cs2-external-view/releases)
 - Copy/move the files to the server's `csgo` directory
-
-> [!WARNING]
-> Do not run this standalone version with lupercalia-mg-cs2 plugin!
-
-### With Lupercalia MG Plugin
-
-- Install [Lupercalia MG Plugin](https://github.com/fltuna/lupercalia-mg-cs2)
-- Download **HelperOnly** version from the [latest ExternalView release](https://github.com/spitice/cs2-external-view/releases)
-- Copy/move the files to the server's `csgo` directory
-
-> [!CAUTION]
-> ConVar names are different from the standalone version.
 
 
 ## Test map
@@ -162,6 +151,8 @@ I'd like to acknowledge the ideas and inspirations I've drawn from the following
 	- Easier development of CSSharp plugin
 - [CounterStrikeSharp](https://docs.cssharp.dev/index.html)
 	- OnServerPreEntityThink/OnServerPostEntityThink events for position fixing
+- [CS2TraceRay](https://github.com/schwarper/CS2TraceRay)
+  - Collision detection helper for CSSharp plugins
 
 ## Changelogs
 
@@ -169,7 +160,7 @@ I'd like to acknowledge the ideas and inspirations I've drawn from the following
 
 - Compiled with latest CS#
 - Improved vector calculation
-- Add ConVar: `extv_modelview_enabled` 
+- Add ConVar: `extv_modelview_enabled`
   - Default: 1 (enabled)
 - Add ConVar: `extv_thirdperson_traceblock_enabled`
   - Toggle trace-based camera obstruction for third-person camera

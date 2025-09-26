@@ -1,4 +1,0 @@
-[submodule "cs-extv/extern/lupercalia-mg"]
-	path = cs-extv/extern/lupercalia-mg
-	url = https://github.com/spitice/lupercalia-mg-cs2
-	branch = external-view-v2
