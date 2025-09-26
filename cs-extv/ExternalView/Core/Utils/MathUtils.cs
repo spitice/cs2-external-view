@@ -1,4 +1,4 @@
-﻿using CounterStrikeSharp.API.Modules.Utils;
+using CounterStrikeSharp.API.Modules.Utils;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using Vector = CounterStrikeSharp.API.Modules.Utils.Vector;
@@ -203,7 +203,7 @@ namespace LupercaliaMGCore.modules.ExternalView.Utils
                 return Vector3.Zero;
 
             float yaw = PI_OVER_180 * viewAngleDeg.Y;
-            float pitch = PI_OVER_180 * viewAngleDeg.X;
+            float pitch = PI_OVER_180 * -viewAngleDeg.X;
 
 #if NET7_0_OR_GREATER
             (float sy, float cy) = MathF.SinCos(yaw);
@@ -219,7 +219,7 @@ namespace LupercaliaMGCore.modules.ExternalView.Utils
             var right = new Vector3(-sy, cy, 0f);
             var forward = new Vector3(cy * cp, sy * cp, sp);
 
-            var wishDir = right * moveX + forward * moveY;
+            var wishDir = right * -moveX + forward * moveY;
             return NormalizeFast(wishDir);
         }
 
