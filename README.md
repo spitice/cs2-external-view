@@ -156,6 +156,10 @@ I'd like to acknowledge the ideas and inspirations I've drawn from the following
 
 ## Changelogs
 
+#### v3.1.2 (25-10-19)
+
+- Fix camera entity to hide "ERROR" model
+
 #### v3.1.1 (25-09-26)
 
 - Remove dependencies from release packagen

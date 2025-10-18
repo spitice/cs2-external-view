@@ -53,6 +53,14 @@ namespace LupercaliaMGCore.modules.ExternalView.CSSharp
             cameraEnt.Spawnflags = 256; // No collisions. Maybe we don't need it because the prop model is empty.
             cameraEnt.DispatchSpawn();
 
+            var skeleton = cameraEnt.CBodyComponent?.SceneNode?.GetSkeletonInstance();
+            if (skeleton != null)
+            {
+                skeleton.Scale = 0.0f;
+            }
+            Utilities.SetStateChanged(cameraEnt, "CBaseEntity", "m_CBodyComponent");
+
+            cameraEnt.RenderMode = RenderMode_t.kRenderTransAlpha;
             cameraEnt.Render = Color.FromArgb(0, 255, 255, 255);
             Utilities.SetStateChanged(cameraEnt, "CBaseModelEntity", "m_clrRender");
 
